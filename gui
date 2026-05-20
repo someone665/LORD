@@ -1,0 +1,128 @@
+local player = game.Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "c00lgui"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = player.PlayerGui
+
+-- MAIN FRAME
+local frame = Instance.new("Frame")
+frame.Parent = gui
+frame.AnchorPoint = Vector2.new(0.5,0.5)
+
+-- MOBILE FRIENDLY SIZE
+frame.Size = UDim2.new(0.32,0,0.55,0)
+
+-- CENTER SCREEN
+frame.Position = UDim2.new(0.5,0,0.5,0)
+
+frame.BackgroundColor3 = Color3.fromRGB(20,0,0)
+frame.BorderSizePixel = 0
+frame.Active = true
+
+-- ROUND CORNERS
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0,12)
+corner.Parent = frame
+
+-- TITLE BAR
+local top = Instance.new("Frame")
+top.Parent = frame
+top.Size = UDim2.new(1,0,0,42)
+top.BackgroundColor3 = Color3.fromRGB(50,0,0)
+top.BorderSizePixel = 0
+
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0,12)
+topCorner.Parent = top
+
+local title = Instance.new("TextLabel")
+title.Parent = top
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1,0,1,0)
+title.Text = "c00lgui"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextScaled = true
+title.Font = Enum.Font.Code
+
+-- CONTENT HOLDER
+local holder = Instance.new("Frame")
+holder.Parent = frame
+holder.BackgroundTransparency = 1
+holder.Position = UDim2.new(0,0,0,50)
+holder.Size = UDim2.new(1,0,1,-55)
+
+local layout = Instance.new("UIListLayout")
+layout.Parent = holder
+layout.Padding = UDim.new(0,6)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- BUTTON CREATOR
+local function makeButton(text)
+	local btn = Instance.new("TextButton")
+	btn.Parent = holder
+	btn.Size = UDim2.new(0.9,0,0,42)
+	btn.BackgroundColor3 = Color3.fromRGB(70,0,0)
+	btn.TextColor3 = Color3.new(1,1,1)
+	btn.TextScaled = true
+	btn.Font = Enum.Font.Code
+	btn.Text = text
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0,8)
+	c.Parent = btn
+
+	return btn
+end
+
+-- MOBILE DRAGGING
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+top.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+top.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+
+		local delta = input.Position - dragStart
+
+		frame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- EXAMPLE BUTTONS
+local decalBtn = makeButton("Decal Spam")
+local killBtn = makeButton("Kill All")
+local gunBtn = makeButton("Give Gun")
+local skyBtn = makeButton("Skybox")
